@@ -33,6 +33,7 @@ class TestTriangle:
             pytest.param(Circle(1)),
             pytest.param(Rectangle(1, 2)),
             pytest.param(Square(1)),
+            pytest.param(Triangle(1, 1, 1)),
     ))
     def test_add_area(self, figure):
         """Метод add_area возвращает сумму площадей фигур"""
