@@ -30,10 +30,10 @@ class TestTriangle:
         assert triangle.name
 
     @pytest.mark.parametrize('figure', (
-            pytest.param(Circle(1)),
-            pytest.param(Rectangle(1, 2)),
-            pytest.param(Square(1)),
-            pytest.param(Triangle(1, 1, 1)),
+            pytest.param(Circle(1), id='Circle'),
+            pytest.param(Rectangle(1, 2), id='Rectangle'),
+            pytest.param(Square(1), id='Square'),
+            pytest.param(Triangle(1, 1, 1), id='Triangle'),
     ))
     def test_add_area(self, figure):
         """Метод add_area возвращает сумму площадей фигур"""
