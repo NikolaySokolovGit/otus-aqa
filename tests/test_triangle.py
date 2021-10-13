@@ -23,7 +23,7 @@ class TestTriangle:
         assert triangle is None, f"Треугольник со сторонами {size_a, size_b, size_c} не существует"
 
     def test_triangle_parameters(self):
-        """У треугольника есть параметры"""
+        """У треугольника есть параметры name, area, perimeter"""
         triangle = Triangle(1, 1, 1)
         assert triangle.perimeter
         assert triangle.area
