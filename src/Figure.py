@@ -5,7 +5,6 @@ from src.utils import validate_size
 
 class Figure(ABC):
     def __init__(self, *args):
-        print('init')
         validate_size(*args)
 
     @property
