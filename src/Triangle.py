@@ -3,6 +3,8 @@ from src.utils import validate_size
 
 
 class Triangle(Figure):
+    name = 'Triangle'
+
     def __new__(cls, size_a, size_b, size_c):
         validate_size(size_a, size_b, size_c)
         if cls.check_triangle_existence(size_a, size_b, size_c):
