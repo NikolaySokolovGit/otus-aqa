@@ -1,8 +1,10 @@
 from src.Figure import Figure
+from src.utils import validate_size
 
 
 class Triangle(Figure):
     def __new__(cls, size_a, size_b, size_c):
+        validate_size(size_a, size_b, size_c)
         if cls.check_triangle_existence(size_a, size_b, size_c):
             instance = super(Triangle, cls).__new__(cls)
             instance.size_a = size_a
@@ -26,3 +28,8 @@ class Triangle(Figure):
     @property
     def perimeter(self):
         return sum((self.size_a, self.size_b, self.size_c))
+
+
+if __name__ == '__main__':
+    t = Triangle(1, 2, 3)
+    print(t)
