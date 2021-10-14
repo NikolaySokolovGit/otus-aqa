@@ -15,7 +15,3 @@ class Square(Figure):
     @property
     def perimeter(self):
         return self.size * 4
-
-
-if __name__ == '__main__':
-    s = Square('string')
