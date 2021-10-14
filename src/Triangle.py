@@ -30,8 +30,3 @@ class Triangle(Figure):
     @property
     def perimeter(self):
         return sum((self.size_a, self.size_b, self.size_c))
-
-
-if __name__ == '__main__':
-    t = Triangle(1, 2, 3)
-    print(t)
