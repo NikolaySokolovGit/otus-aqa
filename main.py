@@ -4,9 +4,10 @@ import json
 
 def get_books(filepath):
     """Читает файл с информацией о книгах"""
+    book_fields = ('title', 'author', 'pages', 'genre')
     with open(filepath) as file:
         reader = csv.DictReader(file)
-        books = [{key.lower(): value for key, value in book.items() if key != 'Publisher'} for book in reader]
+        books = [{key.lower(): value for key, value in book.items() if key.lower() in book_fields} for book in reader]
     return books
 
 
@@ -18,7 +19,7 @@ def get_users(filepath):
 
 
 def get_users_main_info(users):
-    """Подготовавливает информацию о юзерах согласно референсу"""
+    """Представляет информацию о юзерах согласно референсу"""
     users = [
         {
             'name': user['name'],
