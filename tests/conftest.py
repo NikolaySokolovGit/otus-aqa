@@ -10,6 +10,9 @@ def pytest_addoption(parser):
 @pytest.fixture
 def browser(request):
     driver = request.config.getoption('browser')
+    url = request.config.getoption('url')
+    url = f'{url}/' if not url.endswith('/') else url
+
     drivers = {
         'chrome': webdriver.Chrome,
         'opera': webdriver.Opera,
@@ -21,5 +24,11 @@ def browser(request):
         driver.quit()
 
     request.addfinalizer(finalizer)
+
+    def go_to_path(path=''):
+        driver.get(f'{url}{path}')
+
+    driver.open = go_to_path
+    driver.open()
 
     return driver
