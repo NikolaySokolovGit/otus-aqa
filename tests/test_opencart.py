@@ -1,7 +1,9 @@
 import random
 
+import pytest
 from faker import Faker
 
+from page_objects.base_page import BasePage
 from page_objects.catalogue_page import CataloguePage
 from page_objects.login_page import LoginPage
 from page_objects.main_page import MainPage
@@ -77,7 +79,15 @@ class TestOpencart:
             page.verify_element_presence(locator)
 
     def test_registration(self, browser):
-        MainPage(browser).go_to_register()
+        BasePage(browser).go_to_register()
         RegisterPage(browser).register(fake.word(), fake.word(), fake.email(), fake.phone_number(), fake.password())
 
         assert browser.current_url.endswith('account/success')
+
+    @pytest.mark.parametrize('index, currency', ((0, '€'), (1, '£'), (2, '$')))
+    def test_switch_currency(self, browser, index, currency):
+        page = BasePage(browser)
+        page.switch_currency(index)
+
+        assert page.current_currency() == currency
+

@@ -6,6 +6,8 @@ from selenium.webdriver.support import expected_conditions as ec
 
 class BasePage:
     CURRENCY_FORM = (By.CSS_SELECTOR, '#form-currency')
+    CURRENCY_SELECT = (By.CSS_SELECTOR, '.currency-select')
+    CURRENT_CURRENCY = (By.CSS_SELECTOR, '#form-currency strong')
     CART = (By.CSS_SELECTOR, '#cart-total')
     MENU = (By.CSS_SELECTOR, '#menu')
     MY_ACCOUNT = (By.CSS_SELECTOR, '.dropdown')
@@ -36,3 +38,10 @@ class BasePage:
     def go_to_catalogue(self, index):
         self.driver.find_elements(*self.CATALOGUE_DROPDOWN)[index].click()
         self.driver.find_element(*self.SEE_ALL).click()
+
+    def switch_currency(self, index):
+        self.driver.find_element(*self.CURRENCY_FORM).click()
+        self.driver.find_elements(*self.CURRENCY_SELECT)[index].click()
+
+    def current_currency(self):
+        return self.driver.find_element(*self.CURRENT_CURRENCY).text
