@@ -1,11 +1,15 @@
 import random
 
+from faker import Faker
+
 from page_objects.catalogue_page import CataloguePage
 from page_objects.login_page import LoginPage
 from page_objects.main_page import MainPage
 from page_objects.product_page import ProductPage
 from page_objects.register_page import RegisterPage
 
+
+fake = Faker()
 
 class TestOpencart:
     def test_main_page(self, browser):
@@ -71,3 +75,9 @@ class TestOpencart:
         )
         for locator in elements_to_check:
             page.verify_element_presence(locator)
+
+    def test_registration(self, browser):
+        MainPage(browser).go_to_register()
+        RegisterPage(browser).register(fake.word(), fake.word(), fake.email(), fake.phone_number(), fake.password())
+
+        assert browser.current_url.endswith('account/success')
