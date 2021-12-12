@@ -3,6 +3,7 @@ import random
 import pytest
 from faker import Faker
 
+from page_objects.admin_page import AdminPage
 from page_objects.base_page import BasePage
 from page_objects.catalogue_page import CataloguePage
 from page_objects.login_page import LoginPage
@@ -12,6 +13,7 @@ from page_objects.register_page import RegisterPage
 
 
 fake = Faker()
+
 
 class TestOpencart:
     def test_main_page(self, browser):
@@ -90,4 +92,22 @@ class TestOpencart:
         page.switch_currency(index)
 
         assert page.current_currency() == currency
+
+    def test_add_product(self, browser, admin_user):
+        page = AdminPage(browser)
+        page.open()
+        page.login(**admin_user)
+        page.go_to_products()
+        page.add_product('sample', 'smp', 'sample')
+        browser.find_element(*page.SUCCESS)
+
+    def test_delete_product(self, browser, admin_user):
+        page = AdminPage(browser)
+        page.open()
+        page.login(**admin_user)
+        page.go_to_products()
+        page.add_product('delete', 'dlt', 'delete')
+        page.select_product(0)
+        page.delete_product()
+        browser.find_element(*page.SUCCESS)
 
