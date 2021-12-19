@@ -1,14 +1,12 @@
 import pytest
 from selenium import webdriver
 
-from database import MariaDB
-from utils import db_add_admin_user
-
 
 def pytest_addoption(parser):
     parser.addoption("--browser", action="store", choices=('chrome', 'opera', 'firefox'), default='chrome')
     parser.addoption("--url", action="store", required=True)
-    parser.addoption("--db_url", action="store", default="192.168.0.103:3306")
+    parser.addoption("--admin_username", action="store", required=True)
+    parser.addoption("--admin_password", action="store", required=True)
 
 
 @pytest.fixture
@@ -39,14 +37,9 @@ def browser(request):
 
 
 @pytest.fixture(scope='session')
-def admin_user(request, username='username', password='admin_password'):
-    db_add_admin_user(username, password)
-
-    def delete_admin():
-        sql = f"delete from oc_user where username = '{username}'"
-        with MariaDB() as db:
-            db.execute(sql)
-
-    request.addfinalizer(delete_admin)
-
-    return {'username': username, 'password': password}
+def admin_user(request):
+    user = {
+        'username': request.config.getoption('admin_username'),
+        'password': request.config.getoption('admin_password')
+    }
+    return user
