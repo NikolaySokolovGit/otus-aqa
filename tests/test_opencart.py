@@ -1,60 +1,113 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as ec
+import random
+
+import pytest
+from faker import Faker
+
+from page_objects.admin_page import AdminPage
+from page_objects.base_page import BasePage
+from page_objects.catalogue_page import CataloguePage
+from page_objects.login_page import LoginPage
+from page_objects.main_page import MainPage
+from page_objects.product_page import ProductPage
+from page_objects.register_page import RegisterPage
+
+
+fake = Faker()
 
 
 class TestOpencart:
-    product_url = 'index.php?route=product/product&path=20&product_id=42'
-    catalogue_url = 'index.php?route=product/category&path=20'
-    register_url = 'index.php?route=account/register'
-    login_url = 'index.php?route=account/login'
+    def test_main_page(self, browser):
+        page = MainPage(browser)
+        elements_to_check = (
+            page.SEARCH_FIELD,
+            page.CART,
+            page.CURRENCY_FORM,
+            page.PRODUCT_LAYOUT,
+            page.MENU,
+        )
+        for locator in elements_to_check:
+            page.verify_element_presence(locator)
 
-    def test_main_page(self, browser, pytestconfig):
-        url = pytestconfig.getoption('url')
-        browser.get(url)
-        wait = WebDriverWait(browser, 3)
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#search')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '.product-layout')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#form-currency')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#cart-total')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#menu')))
+    def test_product_page(self, browser):
+        MainPage(browser).go_to_product(random.randint(0, 3))
+        page = ProductPage(browser)
+        elements_to_check = (
+            page.LIKE,
+            page.COMPARE,
+            page.ADD_TO_CART,
+            page.QUANTITY,
+            page.NAV,
+        )
+        for locator in elements_to_check:
+            page.verify_element_presence(locator)
 
-    def test_product_page(self, browser, pytestconfig):
-        url = f'{pytestconfig.getoption("url")}{self.product_url}'
-        browser.get(url)
-        wait = WebDriverWait(browser, 3)
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#button-cart')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '.fa-heart')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '.fa-exchange')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-quantity')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '.nav-tabs')))
+    def test_catalogue_page(self, browser):
+        MainPage(browser).go_to_catalogue(0)
+        page = CataloguePage(browser)
+        elements_to_check = (
+            page.SORT,
+            page.PRODUCT_LAYOUT,
+            page.LIMIT,
+            page.GRID_BUTTON,
+            page.LIST_BUTTON,
+        )
+        for locator in elements_to_check:
+            page.verify_element_presence(locator)
 
-    def test_catalogue_page(self, browser, pytestconfig):
-        url = f'{pytestconfig.getoption("url")}{self.catalogue_url}'
-        browser.get(url)
-        wait = WebDriverWait(browser, 3)
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '.fa-th-list')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '.fa-th')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-sort')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-limit')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '.product-layout')))
+    def test_register_page(self, browser):
+        MainPage(browser).go_to_register()
+        page = RegisterPage(browser)
+        elements_to_check = (
+            page.PASSWORD_FIELD,
+            page.EMAIL_FIELD,
+            page.FIRSTNAME_FIELD,
+            page.LASTNAME_FIELD,
+            page.TELEPHONE_FIELD,
+        )
+        for locator in elements_to_check:
+            page.verify_element_presence(locator)
 
-    def test_register_page(self, browser, pytestconfig):
-        url = f'{pytestconfig.getoption("url")}{self.register_url}'
-        browser.get(url)
-        wait = WebDriverWait(browser, 3)
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-firstname')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-lastname')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-email')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-telephone')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-password')))
+    def test_login_page(self, browser):
+        MainPage(browser).go_to_login()
+        page = LoginPage(browser)
+        elements_to_check = (
+            page.PASSWORD_FIELD,
+            page.EMAIL_FIELD,
+            page.ACCOUNT_LINK,
+            page.FORGOTTEN_PASSWORD,
+            page.SUBMIT_BUTTON,
+        )
+        for locator in elements_to_check:
+            page.verify_element_presence(locator)
 
-    def test_login_page(self, browser, pytestconfig):
-        url = f'{pytestconfig.getoption("url")}{self.register_url}'
-        browser.get(url)
-        wait = WebDriverWait(browser, 3)
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-email')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#input-password')))
-        wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '[type="submit"]')))
-        wait.until(ec.presence_of_element_located((By.LINK_TEXT, 'Forgotten Password')))
-        wait.until(ec.presence_of_element_located((By.LINK_TEXT, 'Account')))
+    def test_registration(self, browser):
+        BasePage(browser).go_to_register()
+        RegisterPage(browser).register(fake.word(), fake.word(), fake.email(), fake.phone_number(), fake.password())
+
+        assert browser.current_url.endswith('account/success')
+
+    @pytest.mark.parametrize('index, currency', ((0, '€'), (1, '£'), (2, '$')))
+    def test_switch_currency(self, browser, index, currency):
+        page = BasePage(browser)
+        page.switch_currency(index)
+
+        assert page.current_currency() == currency
+
+    def test_add_product(self, browser, admin_user):
+        page = AdminPage(browser)
+        page.open()
+        page.login(**admin_user)
+        page.go_to_products()
+        page.add_product('sample', 'smp', 'sample')
+        browser.find_element(*page.SUCCESS)
+
+    def test_delete_product(self, browser, admin_user):
+        page = AdminPage(browser)
+        page.open()
+        page.login(**admin_user)
+        page.go_to_products()
+        page.add_product('delete', 'dlt', 'delete')
+        page.select_product(0)
+        page.delete_product()
+        browser.find_element(*page.SUCCESS)
+
