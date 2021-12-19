@@ -7,7 +7,7 @@ from utils import db_add_admin_user
 
 def pytest_addoption(parser):
     parser.addoption("--browser", action="store", choices=('chrome', 'opera', 'firefox'), default='chrome')
-    parser.addoption("--url", action="store")
+    parser.addoption("--url", action="store", required=True)
     parser.addoption("--db_url", action="store", default="192.168.0.103:3306")
 
 
@@ -15,6 +15,8 @@ def pytest_addoption(parser):
 def browser(request):
     driver = request.config.getoption('browser')
     url = request.config.getoption('url')
+    if url is None:
+        raise ValueError('Specify')
     url = f'{url}/' if not url.endswith('/') else url
 
     drivers = {
