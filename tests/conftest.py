@@ -15,8 +15,6 @@ def pytest_addoption(parser):
 def browser(request):
     driver = request.config.getoption('browser')
     url = request.config.getoption('url')
-    if url is None:
-        raise ValueError('Specify')
     url = f'{url}/' if not url.endswith('/') else url
 
     drivers = {
