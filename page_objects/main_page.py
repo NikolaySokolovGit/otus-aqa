@@ -7,4 +7,5 @@ class MainPage(BasePage):
     PRODUCT_LAYOUT = (By.CSS_SELECTOR, '.product-layout')
 
     def go_to_product(self, index):
+        self.logger.info(f"Going to product #{index}")
         self.driver.find_elements(*self.PRODUCT_LAYOUT)[index].click()

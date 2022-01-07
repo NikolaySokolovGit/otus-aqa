@@ -15,6 +15,7 @@ class RegisterPage(BasePage):
     CONTINUE_BUTTON = (By.CSS_SELECTOR, '[type="Submit"]')
 
     def register(self, firstname, lastname, email, telephone, password):
+        self.logger.info(f"Registering user. {firstname=}, {lastname=}, {email=}, {telephone=}, {password=}")
         firstname_field = self.driver.find_element(*self.FIRSTNAME_FIELD)
         lastname_field = self.driver.find_element(*self.LASTNAME_FIELD)
         email_field = self.driver.find_element(*self.EMAIL_FIELD)

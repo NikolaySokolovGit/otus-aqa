@@ -17,6 +17,7 @@ fake = Faker()
 
 class TestOpencart:
     def test_main_page(self, browser):
+        browser.test_name = "main_page"
         page = MainPage(browser)
         elements_to_check = (
             page.SEARCH_FIELD,
@@ -29,6 +30,7 @@ class TestOpencart:
             page.verify_element_presence(locator)
 
     def test_product_page(self, browser):
+        browser.test_name = "product_page"
         MainPage(browser).go_to_product(random.randint(0, 3))
         page = ProductPage(browser)
         elements_to_check = (
@@ -42,6 +44,7 @@ class TestOpencart:
             page.verify_element_presence(locator)
 
     def test_catalogue_page(self, browser):
+        browser.test_name = "catalog_page"
         MainPage(browser).go_to_catalogue(0)
         page = CataloguePage(browser)
         elements_to_check = (
@@ -55,6 +58,7 @@ class TestOpencart:
             page.verify_element_presence(locator)
 
     def test_register_page(self, browser):
+        browser.test_name = "register_page"
         MainPage(browser).go_to_register()
         page = RegisterPage(browser)
         elements_to_check = (
@@ -68,6 +72,7 @@ class TestOpencart:
             page.verify_element_presence(locator)
 
     def test_login_page(self, browser):
+        browser.test_name = "login_page"
         MainPage(browser).go_to_login()
         page = LoginPage(browser)
         elements_to_check = (
@@ -81,6 +86,7 @@ class TestOpencart:
             page.verify_element_presence(locator)
 
     def test_registration(self, browser):
+        browser.test_name = "registration"
         BasePage(browser).go_to_register()
         RegisterPage(browser).register(fake.word(), fake.word(), fake.email(), fake.phone_number(), fake.password())
 
@@ -88,12 +94,14 @@ class TestOpencart:
 
     @pytest.mark.parametrize('index, currency', ((0, '€'), (1, '£'), (2, '$')))
     def test_switch_currency(self, browser, index, currency):
+        browser.test_name = "switch_currency"
         page = BasePage(browser)
         page.switch_currency(index)
 
         assert page.current_currency() == currency
 
     def test_add_product(self, browser, admin_user):
+        browser.test_name = "add product"
         page = AdminPage(browser)
         page.open()
         page.login(**admin_user)
@@ -102,6 +110,7 @@ class TestOpencart:
         browser.find_element(*page.SUCCESS)
 
     def test_delete_product(self, browser, admin_user):
+        browser.test_name = "delete product"
         page = AdminPage(browser)
         page.open()
         page.login(**admin_user)

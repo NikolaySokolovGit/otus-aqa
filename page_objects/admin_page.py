@@ -1,3 +1,6 @@
+import logging
+import os
+
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
@@ -25,11 +28,23 @@ class AdminPage:
 
     def __init__(self, driver):
         self.driver = driver
+        self._cfg_logger()
+
+    def _cfg_logger(self):
+        logging.basicConfig(format='%(level)s | %(name)s | %(message)s')
+        self.logger = logging.getLogger(type(self).__name__)
+        self.logger.setLevel(logging.INFO)
+        os.makedirs('logs', exist_ok=True)
+        fh = logging.FileHandler(f"logs/{self.driver.test_name}.log")
+        fh.setFormatter(logging.Formatter('%(name)s | %(levelname)s | %(message)s'))
+        self.logger.addHandler(fh)
 
     def open(self):
+        self.logger.info("Opening admin page")
         self.driver.open(self.PATH)
 
     def login(self, username, password):
+        self.logger.info(f"logging in. username: {username}, password: {password}")
         username_field = self.driver.find_element(*self.USERNAME)
         password_field = self.driver.find_element(*self.PASSWORD)
 
@@ -43,6 +58,7 @@ class AdminPage:
         submit_btn.click()
 
     def go_to_products(self, timeout=2):
+        self.logger.info("Going to products")
         wait = WebDriverWait(self.driver, timeout)
         for elem in (self.CATALOG, self.PRODUCTS):
             try:
@@ -51,6 +67,7 @@ class AdminPage:
                 raise AssertionError(f'Элемент с локатором {elem} не найден за {timeout} с.')
 
     def add_product(self, product_name, meta_tag, model):
+        self.logger.info(f"Adding product: {product_name=}, {meta_tag=}, {model=}")
         self.driver.find_element(*self.PLUS).click()
         product_name_field = self.driver.find_element(*self.PRODUCT_NAME)
         meta_tag_field = self.driver.find_element(*self.META_TAG_TITLE)
@@ -62,9 +79,11 @@ class AdminPage:
         self.driver.find_element(*self.SAVE).click()
 
     def select_product(self, index):
+        self.logger.info(f"Selecting product #{index}")
         self.driver.find_elements(*self.PRODUCT_CHECKBOX)[index].click()
 
     def delete_product(self):
+        self.logger.info("Deleting product")
         self.driver.find_element(*self.DELETE_BTN).click()
         alert = self.driver.switch_to.alert
         alert.accept()
