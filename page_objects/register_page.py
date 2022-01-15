@@ -1,3 +1,5 @@
+import allure
+import selenium.common.exceptions
 from selenium.webdriver.common.by import By
 
 from page_objects.base_page import BasePage
@@ -14,26 +16,41 @@ class RegisterPage(BasePage):
     PRIVACY_POLICY = (By.CSS_SELECTOR, '[type="checkbox"]')
     CONTINUE_BUTTON = (By.CSS_SELECTOR, '[type="Submit"]')
 
+    @allure.step("Registering user. {firstname}, {lastname}, {email}, {telephone}, {password}")
     def register(self, firstname, lastname, email, telephone, password):
         self.logger.info(f"Registering user. {firstname=}, {lastname=}, {email=}, {telephone=}, {password=}")
-        firstname_field = self.driver.find_element(*self.FIRSTNAME_FIELD)
-        lastname_field = self.driver.find_element(*self.LASTNAME_FIELD)
-        email_field = self.driver.find_element(*self.EMAIL_FIELD)
-        telephone_field = self.driver.find_element(*self.TELEPHONE_FIELD)
-        password_field = self.driver.find_element(*self.PASSWORD_FIELD)
-        repeat_password_field = self.driver.find_element(*self.REPEAT_PASSWORD)
+        try:
+            firstname_field = self.driver.find_element(*self.FIRSTNAME_FIELD)
+            lastname_field = self.driver.find_element(*self.LASTNAME_FIELD)
+            email_field = self.driver.find_element(*self.EMAIL_FIELD)
+            telephone_field = self.driver.find_element(*self.TELEPHONE_FIELD)
+            password_field = self.driver.find_element(*self.PASSWORD_FIELD)
+            repeat_password_field = self.driver.find_element(*self.REPEAT_PASSWORD)
+        except selenium.common.exceptions.NoSuchElementException as e:
+            allure.attach(
+                body=self.driver.get_screenshot_as_png(),
+                name="screenshot_image",
+                attachment_type=allure.attachment_type.PNG
+            )
+            raise AssertionError(f"Element not found: {e.msg}")
 
         fields = (firstname_field, lastname_field, email_field, telephone_field, password_field, repeat_password_field)
         values = (firstname, lastname, email, telephone, password, password)
 
         for field, value in zip(fields, values):
             fill_in_the_field(field, value)
-
-        privacy_policy = self.driver.find_element(*self.PRIVACY_POLICY)
-        privacy_policy.click()
-        continue_button = self.driver.find_element(*self.CONTINUE_BUTTON)
-        continue_button.click()
-
+        try:
+            privacy_policy = self.driver.find_element(*self.PRIVACY_POLICY)
+            privacy_policy.click()
+            continue_button = self.driver.find_element(*self.CONTINUE_BUTTON)
+            continue_button.click()
+        except selenium.common.exceptions.NoSuchElementException as e:
+            allure.attach(
+                body=self.driver.get_screenshot_as_png(),
+                name="screenshot_image",
+                attachment_type=allure.attachment_type.PNG
+            )
+            raise AssertionError(f"Element not found: {e.msg}")
 
 
 

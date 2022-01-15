@@ -1,6 +1,7 @@
 import logging
 import os
 
+import allure
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
@@ -39,10 +40,12 @@ class AdminPage:
         fh.setFormatter(logging.Formatter('%(name)s | %(levelname)s | %(message)s'))
         self.logger.addHandler(fh)
 
+    @allure.step("Opening admin page")
     def open(self):
         self.logger.info("Opening admin page")
         self.driver.open(self.PATH)
 
+    @allure.step("logging in. username: {username}, password: {password}")
     def login(self, username, password):
         self.logger.info(f"logging in. username: {username}, password: {password}")
         username_field = self.driver.find_element(*self.USERNAME)
@@ -57,6 +60,7 @@ class AdminPage:
         submit_btn = self.driver.find_element(*self.SUBMIT)
         submit_btn.click()
 
+    @allure.step("Going to products")
     def go_to_products(self, timeout=2):
         self.logger.info("Going to products")
         wait = WebDriverWait(self.driver, timeout)
@@ -66,6 +70,7 @@ class AdminPage:
             except TimeoutException:
                 raise AssertionError(f'Элемент с локатором {elem} не найден за {timeout} с.')
 
+    @allure.step("Adding product: {product_name}, {meta_tag}, {model}")
     def add_product(self, product_name, meta_tag, model):
         self.logger.info(f"Adding product: {product_name=}, {meta_tag=}, {model=}")
         self.driver.find_element(*self.PLUS).click()
@@ -78,10 +83,12 @@ class AdminPage:
         fill_in_the_field(model_field, model)
         self.driver.find_element(*self.SAVE).click()
 
+    @allure.step("Selecting product #{index}")
     def select_product(self, index):
         self.logger.info(f"Selecting product #{index}")
         self.driver.find_elements(*self.PRODUCT_CHECKBOX)[index].click()
 
+    @allure.step("Deleting product")
     def delete_product(self):
         self.logger.info("Deleting product")
         self.driver.find_element(*self.DELETE_BTN).click()
