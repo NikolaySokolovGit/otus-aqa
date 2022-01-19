@@ -22,17 +22,17 @@ def parse_ip(line, ips):
 
 
 def parse_method(line, methods):
-    method_match = re.search(r"] \"(POST|GET|PUT|DELETE|HEAD)", line)
+    method_match = re.search(r"] \"(POST|GET|PUT|DELETE|HEAD|OPTIONS|CONNECT|TRACE)", line)
     if method_match is not None:
         method = method_match.group(1)
         methods[method] += 1
         return method
 
 
-def create_json(top3ip, top_method, total_requests, durations):
+def create_result_dict(top3ip, methods, total_requests, durations):
     result = {
         "most_frequent_ips": top3ip,
-        "most_frequent_method": top_method,
+        "methods_requests": methods,
         "total_requests": total_requests,
         "longest_durations": [{
             "method": req.method,
@@ -42,7 +42,7 @@ def create_json(top3ip, top_method, total_requests, durations):
             "datetime": req.datetime
         } for req in durations]
     }
-    return json.dumps(result, indent=4)
+    return result
 
 
 def parse_file(file_path):
@@ -51,7 +51,8 @@ def parse_file(file_path):
     ips = defaultdict(int)
     durations = []
     with open(file_path) as file:
-        for line in file.readlines():
+        lines = file.readlines()
+        for line in lines:
             ip = parse_ip(line, ips)
             method = parse_method(line, methods)
             duration = int(line.split()[-1])
@@ -63,13 +64,12 @@ def parse_file(file_path):
                 durations.sort(key=lambda x: x.duration, reverse=True)
                 if len(durations) > 3:
                     durations.pop()
+        total_requests = len(lines)
     top3ip = {key: value for key, value in sorted(ips.items(), key=itemgetter(1), reverse=True)[:3]}
-    top_method = {key: value for key, value in sorted(methods.items(), key=itemgetter(1), reverse=True)[:1]}
-    total_requests = sum(methods.values())
-    result_json = create_json(top3ip, top_method, total_requests, durations)
+    result = create_result_dict(top3ip, methods, total_requests, durations)
     with open(f"{file_name}.json", 'w') as file:
-        json.dump(result_json, file)
-    print(f"{file_name}:\n{result_json}\n")
+        json.dump(result, file, indent=4)
+    print(f"{file_name}:\n{json.dumps(result, indent=4)}\n")
 
 
 def main():
@@ -80,7 +80,7 @@ def main():
             print('specify path to "*.log" file or directory')
     elif os.path.isdir(args.path):
         for file in [f for f in os.listdir(args.path) if f.endswith('.log')]:
-            parse_file(os.path.abspath(file))
+            parse_file(os.path.abspath(f'{args.path}/{file}'))
     else:
         print('path not found')
 
