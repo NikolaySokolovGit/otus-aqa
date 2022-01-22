@@ -21,7 +21,7 @@ def parse_data(data):
     status = re.search(r"status=\d*", data)
     if status:
         status = status.group().split('=')[1]
-    headers = [header for header in data.split('\r\n')[1:]]
+    headers = [header for header in data.split('\r\n')[1:] if header]
     return ParsedData(method, status, headers)
 
 
@@ -29,14 +29,13 @@ def prepare_data(parsed_data, source_address):
     try:
         status = http.HTTPStatus(parsed_data.status)
     except ValueError:
-        status = http.HTTPStatus(200)
+        status = http.HTTPStatus(http.HTTPStatus.OK)
     status_line = f'HTTP/1.1 {status.value} {status.name}'
     headers = '\r\n'.join((status_line, *parsed_data.headers))
     body = '\r\n'.join((
         f'Request method: {parsed_data.method}',
         f'Request source: {source_address}',
-        *parsed_data.headers,
-        '\r\n'
+        *parsed_data.headers
     ))
     result = '\r\n\r\n'.join((headers, body)).encode()
     return result
