@@ -52,7 +52,7 @@ def main():
             while True:
                 data = conn.recv(buf_size)
                 logger.info(f'Request from {address}')
-                if data.decode():
+                if data:
                     logger.info(f'Request data:\n{data.decode()}')
                     response_data = prepare_data(parse_data(data), address)
                     conn.send(response_data)
