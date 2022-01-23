@@ -4,7 +4,7 @@ import re
 import socket
 from collections import namedtuple
 
-host = '192.168.0.102'
+host = ''
 port = 8080
 buf_size = 2048
 
@@ -20,20 +20,24 @@ def parse_data(data):
     method = re.search(r"(GET|PUT|DELETE|POST|OPTIONS)", data).group()
     status = re.search(r"status=\d*", data)
     if status:
-        status = int(status.group().split('=')[1])
+        status = status.group().split('=')[1]
+        status = int(status) if status.isnumeric() else 0
+    else:
+        status = 0
     headers = [header for header in data.split('\r\n')[1:] if header]
     return ParsedData(method, status, headers)
 
 
 def prepare_data(parsed_data, source_address):
     try:
-        status = http.HTTPStatus(parsed_data.status)
+        status = http.HTTPStatus(int(parsed_data.status))
     except ValueError:
         status = http.HTTPStatus(http.HTTPStatus.OK)
     status_line = f'HTTP/1.1 {status.value} {status.name}'
     body = '\r\n'.join((
         f'Request method: {parsed_data.method}',
         f'Request source: {source_address}',
+        f'Response status: {status.value} {status.name}',
         *parsed_data.headers,
         '\r\n'
     ))
