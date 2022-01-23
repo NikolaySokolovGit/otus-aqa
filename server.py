@@ -19,18 +19,18 @@ def parse_data(data):
     data = data.decode()
     method = re.search(r"(GET|PUT|DELETE|POST|OPTIONS)", data).group()
     status = re.search(r"status=\d*", data)
-    if status:
+    try:
         status = status.group().split('=')[1]
-        status = int(status) if status.isnumeric() else 0
-    else:
-        status = 0
+        status = int(status)
+    except (ValueError, TypeError, AttributeError):
+        status = -1
     headers = [header for header in data.split('\r\n')[1:] if header]
     return ParsedData(method, status, headers)
 
 
 def prepare_data(parsed_data, source_address):
     try:
-        status = http.HTTPStatus(int(parsed_data.status))
+        status = http.HTTPStatus(parsed_data.status)
     except ValueError:
         status = http.HTTPStatus(http.HTTPStatus.OK)
     status_line = f'HTTP/1.1 {status.value} {status.name}'
