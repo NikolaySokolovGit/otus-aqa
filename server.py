@@ -11,7 +11,7 @@ buf_size = 2048
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.DEBUG)
 
 
 def parse_data(data):
@@ -40,7 +40,7 @@ def prepare_data(parsed_data, source_address):
     headers = '\r\n'.join((
         status_line,
         f'Content-Length: {len(body)}',
-        f'Content-Type: text/html',
+        f'Content-Type: text',
         *parsed_data.headers))
     result = '\r\n\r\n'.join((headers, body)).encode()
     return result
@@ -58,7 +58,7 @@ def main():
                 data = conn.recv(buf_size)
                 logger.info(f'Request from {address}')
                 if data:
-                    logger.info(f'Request data:\n{data}')
+                    logger.debug(f'Request data:\n{data}')
                     response_data = prepare_data(parse_data(data), address)
                     conn.send(response_data)
                     logger.debug(f'Sent data:\n{response_data}')
