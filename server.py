@@ -11,7 +11,7 @@ buf_size = 2048
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.ERROR)
 
 
 def parse_data(data):
@@ -20,7 +20,7 @@ def parse_data(data):
     method = re.search(r"(GET|PUT|DELETE|POST|OPTIONS)", data).group()
     status = re.search(r"status=\d*", data)
     if status:
-        status = status.group().split('=')[1]
+        status = int(status.group().split('=')[1])
     headers = [header for header in data.split('\r\n')[1:] if header]
     return ParsedData(method, status, headers)
 
@@ -31,12 +31,17 @@ def prepare_data(parsed_data, source_address):
     except ValueError:
         status = http.HTTPStatus(http.HTTPStatus.OK)
     status_line = f'HTTP/1.1 {status.value} {status.name}'
-    headers = '\r\n'.join((status_line, *parsed_data.headers))
     body = '\r\n'.join((
         f'Request method: {parsed_data.method}',
         f'Request source: {source_address}',
-        *parsed_data.headers
+        *parsed_data.headers,
+        '\r\n'
     ))
+    headers = '\r\n'.join((
+        status_line,
+        f'Content-Length: {len(body)}',
+        f'Content-Type: text/html',
+        *parsed_data.headers))
     result = '\r\n\r\n'.join((headers, body)).encode()
     return result
 
@@ -53,7 +58,7 @@ def main():
                 data = conn.recv(buf_size)
                 logger.info(f'Request from {address}')
                 if data:
-                    logger.info(f'Request data:\n{data.decode()}')
+                    logger.info(f'Request data:\n{data}')
                     response_data = prepare_data(parse_data(data), address)
                     conn.send(response_data)
                     logger.debug(f'Sent data:\n{response_data}')
