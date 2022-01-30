@@ -11,7 +11,7 @@ def parse_line(line):
         last_idx = len_fields - 1
         result[last_idx] = ' '.join((elem for elem in result[last_idx:]))
         result = result[:len_fields]
-    PSAux = namedtuple('PSAux', ('user', 'pid', 'cpu', 'mem', 'vsz', 'rss', 'tty', 'stat', 'start', 'time', 'command'))
+    PSAux = namedtuple('PSAux', fields)
     types = (str, int, float, float, int, int, str, str, str, str, str)
     return PSAux(*(tp(value) for tp, value in zip(types, result)))
 
